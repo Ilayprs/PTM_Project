@@ -1,5 +1,5 @@
 package test;
-//try
+
 public interface Agent {
     String getName();
     void reset();
