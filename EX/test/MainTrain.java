@@ -122,7 +122,7 @@ public class MainTrain {
     }
     public static void main(String[] args) {
         testCycles();
-        //testBinGraph();
+        testBinGraph();
         //testTopicsGraph();
         System.out.println("done");
     }
