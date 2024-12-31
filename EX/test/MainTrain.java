@@ -123,7 +123,7 @@ public class MainTrain {
     public static void main(String[] args) {
         testCycles();
         testBinGraph();
-        //testTopicsGraph();
+        testTopicsGraph();
         System.out.println("done");
     }
 
