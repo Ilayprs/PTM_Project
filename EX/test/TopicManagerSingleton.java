@@ -22,6 +22,10 @@ public class TopicManagerSingleton {
         public void clear(){
             this.topicsMap = new HashMap<>();
         }
+
+        public Map<String, Topic> getData() {
+            return topicsMap;
+        }
     }
     public static TopicManager get(){
         return TopicManager.instance;
