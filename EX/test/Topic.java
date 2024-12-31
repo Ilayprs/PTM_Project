@@ -44,5 +44,13 @@ public class Topic {
         }
     }
 
+    public ArrayList<Agent> getSubs(){
+        return this.subs;
+    }
+
+    public ArrayList<Agent> getPubs(){
+        return this.pubs;
+    }
+
 
 }
