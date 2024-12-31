@@ -14,7 +14,6 @@ public class Graph extends ArrayList<Node>{
         }
         return false;
     }
-
     public void createFromTopics() {
         TopicManager tm = TopicManagerSingleton.get();
         Map<String, Topic> map = tm.getData();
@@ -22,7 +21,6 @@ public class Graph extends ArrayList<Node>{
         StringBuilder sb;
 
         for (Map.Entry<String, Topic> entry : map.entrySet()) {
-
             sb = new StringBuilder(entry.getKey());
             sb.insert(0, 'T');
             String topicNodeName = sb.toString();
@@ -48,6 +46,7 @@ public class Graph extends ArrayList<Node>{
                 topicNode.addEdge(agentNode);
             }
 
+
             for (Agent publisher : topic.getPubs()) {
                 sb = new StringBuilder(publisher.getName());
                 sb.insert(0, 'A');
@@ -59,6 +58,6 @@ public class Graph extends ArrayList<Node>{
                 }
             }
         }
-        addAll(nodeMap.values());
+        this.addAll(nodeMap.values());
     }
 }
