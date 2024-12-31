@@ -1,9 +1,7 @@
 package test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class Node {
@@ -13,47 +11,51 @@ public class Node {
 
     public Node(String name){
         this.name = name;
-        edges = new ArrayList<>();
+        edges = new ArrayList<Node>();
+        msg = new Message(name);
     }
-    public void setName(String name){
-        this.name = name;
-    }
+
     public String getName(){
         return name;
     }
-    public void addEdge(Node n){
-        edges.add(n);
-    }
-    public void setEdges(List<Node> edges){
-        this.edges = edges;
-    }
+
     public List<Node> getEdges(){
         return edges;
     }
-    public void setMsg(Message msg){
-        this.msg = msg;
-    }
-    public Message getMsg(){
+
+    public Message getMessage(){
         return msg;
     }
 
-    public boolean hasCycles() {
-        return hasCyclesHelper(this, null, new HashSet<>());
+    public void setName(String name){
+        this.name = name;
     }
 
-    public boolean hasCyclesHelper(Node current, Node parent, Set<Node> visited) {
-        visited.add(current);
+    public void setEdges(List<Node> edges){
+        this.edges = new ArrayList<Node>(edges);
+    }
 
-        for (Node n : current.edges) {
-            if (!visited.contains(n)) {
-                if (hasCyclesHelper(n, current, visited)) {
-                    return true;
-                }
-            } else if (n != parent) {
+    public void setMsg(Message msg){
+        this.msg = new Message(msg.asText);
+    }
+
+    public void addEdge(Node edge){
+        edges.add(edge);
+    }
+
+    public boolean hasCycles() {
+        return helpHasCycles(this);
+    }
+
+    private boolean helpHasCycles(Node current) {
+        for (Node edge : edges) {
+            if (edge == current) {
+                return true;
+            }
+            if (edge.helpHasCycles(current)) {
                 return true;
             }
         }
-
         return false;
     }
 }
