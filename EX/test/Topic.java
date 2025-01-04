@@ -51,6 +51,8 @@ public class Topic {
     public ArrayList<Agent> getPubs(){
         return this.pubs;
     }
-
+    public String GetName(){
+        return this.name;
+    }
 
 }
