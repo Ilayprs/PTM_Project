@@ -4,25 +4,29 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class ParallelAgent implements Agent {
+    private Agent agent;
 
+    public ParallelAgent(Object agentInstance) {
+        this.agent = (Agent) agentInstance;
+    }
 
     @Override
     public String getName() {
-        return "";
+        return agent.getName();
     }
 
     @Override
     public void reset() {
-
+        agent.reset();
     }
 
     @Override
     public void callback(String topic, Message msg) {
-
+        agent.callback(topic, msg);
     }
 
     @Override
     public void close() {
-
+        agent.close();
     }
 }
