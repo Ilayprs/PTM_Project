@@ -6,14 +6,13 @@ import java.util.ArrayList;
 
 public class IncAgent implements Agent {
 
-    public ArrayList<Topic> subs;
-    public ArrayList<Topic> pubs;
-    public Double x , y;
-    public IncAgent(ArrayList<Topic> subs , ArrayList<Topic> pubs){
+    public Topic subs;
+    public Topic pubs;
+    public Double num;
+    public IncAgent(Topic subs , Topic pubs){
         this.subs = subs;
         this.pubs = pubs;
-        x = 0.0;
-        y = 0.0;
+        num = 0.0;
     }
 
     @Override
@@ -23,41 +22,24 @@ public class IncAgent implements Agent {
 
     @Override
     public void reset() {
-        x = 0.0;
-        y = 0.0;
+        num = 0.0;
+        subs = null;
+        pubs = null;
     }
 
     @Override
     public void callback(String topic, Message msg) {
-        subs.get(0).subscribe(this);
-        subs.get(1).subscribe(this);
-        String content = msg.asText;
-        if (topic.equals(subs.get(0).name)) {
-            x = parseToInt(content, x);
-        } else if (topic.equals(subs.get(1).name)) {
-            y = parseToInt(content, y);
-        }
-
-        if (x != 0.0 && y != 0.0) {
-            double result = x + y;
-            pubs.getFirst().publish(new Message(result));
-            //pubs.get(0).publish(new Message(result));
-        }
-
-    }
-
-    public static Double parseToInt(String content, Double x) {
-        try {
-            return Double.parseDouble(content);
-        } catch (NumberFormatException e) {
-            return 0.0;
+        if(topic.equals(subs.name)){
+            num = msg.asDouble + 1;
+            pubs.publish(new Message(num));
+            pubs.addPublisher(this);
         }
     }
 
     @Override
     public void close() {
-        subs.get(0).unsubscribe(this);
-        subs.get(1).unsubscribe(this);
+        subs.unsubscribe(this);
+        pubs.removePublisher(this);
         this.reset();
     }
 }
