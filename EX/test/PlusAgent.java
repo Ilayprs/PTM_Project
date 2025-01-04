@@ -4,11 +4,15 @@ import java.util.ArrayList;
 
 public class PlusAgent implements Agent {
 
-    public ArrayList<Topic> subs;
-    public ArrayList<Topic> pubs;
-    public PlusAgent(ArrayList<Topic> subs , ArrayList<Topic> pubs){
+    public Topic subs;
+    public Topic pubs;
+
+    public Double x , y;
+    public PlusAgent(Topic subs , Topic pubs){
         this.subs = subs;
         this.pubs = pubs;
+        x = 0.0;
+        y = 0.0;
     }
     @Override
     public String getName() {
@@ -17,29 +21,31 @@ public class PlusAgent implements Agent {
 
     @Override
     public void reset() {
-
+        subs = null;
+        pubs = null;
+        x = 0.0;
+        y = 0.0;
     }
 
     @Override
     public void callback(String topic, Message msg) {
-        double num = 0.0;
-        //subs.get(0).subscribe(this);
-        subs.getFirst().subscribe(this);
-        String content = msg.asText;
-        if (topic.equals(subs.getFirst().name)) {
-            num = IncAgent.parseToInt(content, num);
+        if(topic.equals(subs.name)){
+            x = msg.asDouble;
         }
-        if(num != 0.0){
-            num++;
-            pubs.getFirst().publish(new Message(num));
+        if(topic.equals(subs.name)){
+            y = msg.asDouble;
+        }
+        if(x != 0.0 && y != 0.0){
+            double result = x + y;
+            pubs.publish(new Message(result));
         }
 
     }
 
     @Override
     public void close() {
-        //subs.get(0).unsubscribe(this);
-        subs.getFirst().unsubscribe(this);
+        subs.unsubscribe(this);
+        pubs.removePublisher(this);
         reset();
     }
 }
