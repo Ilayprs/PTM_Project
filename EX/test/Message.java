@@ -35,4 +35,8 @@ public class Message {
             return false; // If an exception is thrown, it's not a valid double
         }
     }
+
+    public Double asDouble() {
+        return asDouble;
+    }
 }
