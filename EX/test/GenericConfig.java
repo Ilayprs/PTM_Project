@@ -11,69 +11,63 @@ public class GenericConfig implements Config{
     List<ParallelAgent> list;
     @Override
     public void create() {
-        String[] parts = null;
-        String className = null;
-        Class<?> clazz = null;
-        Constructor<?> constructor = null;
-        try(BufferedReader in = new BufferedReader(new FileReader(configFile))){
-            List<String> lines = new ArrayList<>();
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(configFile));
+
+            // Initialize list and other variables
+            List<String> lines = new LinkedList<>();
             String line;
-            while ((line = in.readLine()) != null) {
+
+            // Read lines from the configuration file
+            while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }
-            if(lines.size() % 3 == 0){
-                for(int i = 0 ; i < lines.size() ; i++){
-                    parts = lines.get(i).split("\\.");
-                    className = parts[parts.length - 1];
-                    clazz = Class.forName(className);
-                    constructor = clazz.getConstructor(Topic.class , Topic.class);
 
-                    String[] subs = lines.get(i + 1).split(",");
-                    String[] pubs = lines.get(i + 2).split(",");
+            // Ensure that lines are divisible by 3, each agent should have a set of 3 lines (class name, subscribe topics, publish topics)
+            if (lines.size() % 3 == 0) {
+                Iterator<String> iterator = lines.iterator();
 
-                    List<Topic> subTopics = new ArrayList<>();
-                    List<Topic> pubTopics = new ArrayList<>();
+                // Process the configuration in chunks of 3 lines: className, toSub, toPub
+                while (iterator.hasNext()) {
+                    String className = iterator.next(); // Get the class name of the agent
+                    String toSub = iterator.next();     // Get the subscribe topics (comma separated)
+                    String toPub = iterator.next();     // Get the publish topics (comma separated)
 
-                    for (String subTopicName : subs) {
-                        Topic subTopic = new Topic(subTopicName);
-                        subTopics.add(subTopic);
+                    // Load the agent class using reflection
+                    try {
+                        // Reflectively load the agent class
+                        Class<?> clazz = Class.forName(className);
+                        // Get the constructor with the appropriate parameters
+                        Constructor<?> ctor = clazz.getConstructor(Topic[].class, Topic[].class);
+
+                        // Create an instance of the agent
+                        Object myAgent = ctor.newInstance((Object) toSub.split(","), (Object) toPub.split(","));
+                        // Wrap the agent in a ParallelAgent
+                        ParallelAgent pa = new ParallelAgent((Agent) myAgent);
+                        // Add the created ParallelAgent to the list
+                        list.add(pa);
+                    } catch (ClassNotFoundException e) {
+                        // Handle exception if class is not found
+                    } catch (NoSuchMethodException e) {
+                        // Handle exception if the constructor is not found
+                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                        // Handle any errors during agent instantiation
                     }
-
-                    for (String pubTopicName : pubs) {
-                        Topic pubTopic = new Topic(pubTopicName);
-                        pubTopics.add(pubTopic);
-                    }
-
-                    Agent agentInstance = (Agent) constructor.newInstance(subTopics.get(0), pubTopics.get(0));
-                    ParallelAgent parallelAgent = new ParallelAgent(agentInstance);
-
-                    for (Topic subTopic : subTopics) {
-                        subTopic.subscribe(parallelAgent);
-                    }
-                    for (Topic pubTopic : pubTopics) {
-                        pubTopic.addPublisher(parallelAgent);
-                    }
-
-                    list.add(parallelAgent);
                 }
-
+            } else {
+                // Handle case where the configuration file has an invalid number of lines (not divisible by 3)
             }
+
+            reader.close();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            // Handle case where the file is not found
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            // Handle IO exception during file reading
         }
     }
+
+
 
 
 
@@ -97,5 +91,6 @@ public class GenericConfig implements Config{
 
     public void setConfFile(String configFile) {
         this.configFile = configFile;
+        list = new ArrayList<>();
     }
 }
